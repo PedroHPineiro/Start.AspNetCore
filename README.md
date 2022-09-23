@@ -38,5 +38,39 @@ Principios REST:
 - _Layered System_: Em uma arquitetura de sistema em camadas, o cliente pode se conectar a outros intermediários autorizados entre o cliente e o servidor e ainda receber respostas do servidor. Os servidores também podem passar solicitações para outros servidores. Você pode projetar seu serviço da Web RESTful para ser executado em vários servidores com diversas camadas, como segurança, aplicação e lógica de negócios, trabalhando juntos para atender às solicitações do cliente. Essas camadas permanecem invisíveis para o cliente.
 - _Code on demand (opcional)_: Por exemplo, quando você preenche um formulário de registro em qualquer site, seu navegador imediatamente destaca os erros cometidos, como números de telefone incorretos. Ele pode fazer isso devido ao código enviado pelo servidor.
 
+
 ### RESTful
-RESTful é a aplicação dos principios REST.
+    RESTful é a aplicação dos principios REST.
+
+
+### HTTP (HyperText Transport Procol)
+    HTTP Request (requisicao/pedido):
+    - Verbo, URL, Versao do Http
+    - Cabecalho da requisicao (request header)
+    - Corpo da requisicao (request body)
+
+    HTTP Response (resposta):
+    - Versao do HTTP, Codigo de resposta (response code)
+    - Cabecalho da resposta (response header)
+    - Corpo da resposta
+
+    Exemplos de URL
+    - http://loja.com.br
+    - http://loja.com.br/api/produto
+
+        Onde http, chamamos de esquema da URL;
+
+        Onde loja.com.br, chamamos de nome do servidor/host;
+
+        Onde api/produto, chamamos de URL Path (caminho da URL);
+
+
+### Verbos HTTP
+    - GET Recuperar dados de um Resource
+    - POST Enviar dados de um Resource para ser processado (criar)
+    - PUT Enviar dados para atualizar um Resource
+    - DELETE Remover dados de um Resource
+
+Exemplos GET:
+    - https://localhost:7061/api/item
+    - https://localhost:7061/api/item/{id}
