@@ -13,5 +13,6 @@ namespace Sales.API.Models
         }
 
         public DbSet<Item> Items { get; set; }
+        public DbSet<Cliente> Clientes { get; set; }
     }
 }
