@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 using Sales.API.DataAccess;
+using Sales.API.DataAccessNoSql;
 using Sales.API.Models;
 
 //arquitetura MVC: model, controller e view
@@ -18,9 +20,9 @@ namespace Sales.API.Controllers
     [Route("api/[controller]")]
     public class ItemController : ControllerBase
     {
-        private readonly IItemDataAccess itemDataAccess;
+        private readonly ItemDataNoSql itemDataAccess;
 
-        public ItemController(IItemDataAccess itemDataAccess)
+        public ItemController(ItemDataNoSql itemDataAccess)
         {
             this.itemDataAccess = itemDataAccess;
         }
@@ -28,16 +30,16 @@ namespace Sales.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var items = await itemDataAccess.GetItems();
+            var items = await itemDataAccess.GetItemsAsync();
 
             return Ok(items);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            var item = await itemDataAccess.GetItem(id);
+            var item = await itemDataAccess.GetItemAsync(id);
 
             if (item == null)
             {
@@ -50,31 +52,33 @@ namespace Sales.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Item itemModel)
         {
-            var inserted = await itemDataAccess.InsertOne(itemModel);
+            itemModel.Id = ObjectId.GenerateNewId().ToString();
+            
+            await itemDataAccess.CreateItemAsync(itemModel);
 
-            return Ok(inserted);
+            return Ok(itemModel);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Item itemModel)
-        {
-            var model = await itemDataAccess.UpdateOne(id, itemModel);
+        // [HttpPut]
+        // [Route("{id}")]
+        // public async Task<IActionResult> Put(int id, [FromBody] Item itemModel)
+        // {
+        //     var model = await itemDataAccess.UpdateOne(id, itemModel);
 
-            if (model != null)
-            {
-                return Ok(model);
-            }
+        //     if (model != null)
+        //     {
+        //         return Ok(model);
+        //     }
 
-            return NotFound();
-        }
+        //     return NotFound();
+        // }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            await itemDataAccess.DeleteOne(id);
-            return NoContent();
-        }
+        // [HttpDelete]
+        // [Route("{id}")]
+        // public async Task<IActionResult> Delete(int id)
+        // {
+        //     await itemDataAccess.DeleteOne(id);
+        //     return NoContent();
+        // }
     }
 }

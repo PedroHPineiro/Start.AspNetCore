@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Sales.API;
 using Sales.API.DataAccess;
+using Sales.API.DataAccessNoSql;
 using Sales.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +13,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DatabaseContext>(opt => opt.UseInMemoryDatabase("SalesDatabase"));
-builder.Services.AddScoped<IItemDataAccess, ItemDataAccess>();
+builder.Services.Configure<SalesDatabaseSetting>(builder.Configuration.GetSection("SalesDatabase"));
+
+builder.Services.AddScoped<ItemDataNoSql, ItemDataNoSql>();
+builder.Services.AddScoped<CustomerDataNoSql, CustomerDataNoSql>();
+builder.Services.AddScoped<OrderDataNoSql, OrderDataNoSql>();
 
 var app = builder.Build();
 
