@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Sales.API.DataAccess;
 using Sales.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DatabaseContext>(opt => opt.UseInMemoryDatabase("SalesDatabase"));
+builder.Services.AddScoped<IItemDataAccess, ItemDataAccess>();
 
 var app = builder.Build();
 

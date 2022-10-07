@@ -4,7 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Sales.API.DataAccess;
 using Sales.API.Models;
+
+//arquitetura MVC: model, controller e view
+//model -> modelo representativo de dados atraves de objetos/classes
+//view -> basicamente, esta na linha de frente da comunicacao com o usuario final do sistema
+//controller -> intermediacao entre a view e as regras de negocios, com o fornecimento de model ou ate mesmo respondendo o model
 
 namespace Sales.API.Controllers
 {
@@ -12,17 +18,17 @@ namespace Sales.API.Controllers
     [Route("api/[controller]")]
     public class ItemController : ControllerBase
     {
-        private readonly DatabaseContext _context;
+        private readonly IItemDataAccess itemDataAccess;
 
-        public ItemController(DatabaseContext context)
+        public ItemController(IItemDataAccess itemDataAccess)
         {
-            _context = context;
+            this.itemDataAccess = itemDataAccess;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var items = await _context.Items.Where(x => x.Active).ToListAsync();
+            var items = await itemDataAccess.GetItems();
 
             return Ok(items);
         }
@@ -31,8 +37,7 @@ namespace Sales.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var item = await _context.Items.Where(x => x.Id == id && x.Active)
-                .FirstOrDefaultAsync();
+            var item = await itemDataAccess.GetItem(id);
 
             if (item == null)
             {
@@ -45,29 +50,20 @@ namespace Sales.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Item itemModel)
         {
-            _context.Items.Add(itemModel);
-            await _context.SaveChangesAsync();
+            var inserted = await itemDataAccess.InsertOne(itemModel);
 
-            return Ok(itemModel);
+            return Ok(inserted);
         }
 
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Item itemModel)
         {
-            var item = await _context.Items.Where(x => x.Id == id && x.Active)
-                .FirstOrDefaultAsync();
+            var model = await itemDataAccess.UpdateOne(id, itemModel);
 
-            if (item != null)
+            if (model != null)
             {
-                item.Name = itemModel.Name;
-                item.Price = itemModel.Price;
-                item.Active = itemModel.Active;
-
-                _context.Items.Update(item);
-                await _context.SaveChangesAsync();
-                
-                return Ok(itemModel);
+                return Ok(model);
             }
 
             return NotFound();
@@ -77,20 +73,8 @@ namespace Sales.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await _context.Items.Where(x => x.Id == id && x.Active)
-                .FirstOrDefaultAsync();
-
-            if (item != null)
-            {
-                item.Active = false;
-
-                _context.Items.Update(item);
-                await _context.SaveChangesAsync();
-                
-                return NoContent();
-            }
-
-            return NotFound();
+            await itemDataAccess.DeleteOne(id);
+            return NoContent();
         }
     }
 }
