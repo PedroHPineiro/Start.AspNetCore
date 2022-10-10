@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using Sales.API.DataAccessNoSql;
 using Sales.API.Models;
+using Sales.API.ViewModels;
 
 namespace Sales.API.Controllers
 {
@@ -44,13 +45,18 @@ namespace Sales.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Customer customer)
+        public async Task<IActionResult> Post([FromBody] CustomerInputModel inputModel)
         {
-            customer.Id = ObjectId.GenerateNewId().ToString();
-            
-            await _context.CreateCustomerAsync(customer);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return Ok(customer);
+            var model = new Customer(inputModel.Name, inputModel.Email, inputModel.Phone, inputModel.Identity);            
+            
+            await _context.CreateCustomerAsync(model);
+
+            return Ok(inputModel);
         }
 
         // [HttpPut]

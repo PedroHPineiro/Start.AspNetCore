@@ -16,7 +16,7 @@ namespace Sales.API.DataAccessNoSql
         {
             var mongoClient = new MongoClient(salesDatabaseSetting.Value.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(salesDatabaseSetting.Value.DatabaseName);
-            collection = mongoDatabase.GetCollection<Order>(salesDatabaseSetting.Value.ItemCollection);
+            collection = mongoDatabase.GetCollection<Order>(salesDatabaseSetting.Value.OrderCollection);
         }
 
         public async Task<List<Order>> GetOrdersAsync() => await collection.Find(x => true).ToListAsync();

@@ -8,6 +8,7 @@ using MongoDB.Bson;
 using Sales.API.DataAccess;
 using Sales.API.DataAccessNoSql;
 using Sales.API.Models;
+using Sales.API.ViewModels;
 
 //arquitetura MVC: model, controller e view
 //model -> modelo representativo de dados atraves de objetos/classes
@@ -50,13 +51,13 @@ namespace Sales.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Item itemModel)
+        public async Task<IActionResult> Post([FromBody] ItemInputModel itemInputModel)
         {
-            itemModel.Id = ObjectId.GenerateNewId().ToString();
+            var model = new Item(itemInputModel.Name, itemInputModel.Price);
             
-            await itemDataAccess.CreateItemAsync(itemModel);
+            await itemDataAccess.CreateItemAsync(model);
 
-            return Ok(itemModel);
+            return Ok(itemInputModel);
         }
 
         // [HttpPut]
