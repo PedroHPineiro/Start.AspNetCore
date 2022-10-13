@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using Sales.API.DataAccess;
 using Sales.API.DataAccessNoSql;
 using Sales.API.Models;
 using Sales.API.ViewModels;
@@ -59,47 +60,38 @@ namespace Sales.API.Controllers
             return Ok(inputModel);
         }
 
-        // [HttpPut]
-        // [Route("{id}")]
-        // public async Task<IActionResult> Put(int id, [FromBody] Customer Cliente)
-        // {
-        //     var cliente = await _context.Customers.Where(x => x.Id == id && x.Active)
-        //         .FirstOrDefaultAsync();
+         [HttpPut]
+         [Route("{id}")]
+         public async Task<IActionResult> Put(string id, [FromBody] CustomerInputModel CustomerModel)
+         {
+            var customer = await _context.GetCustomerAsync(id);
 
-        //     if (cliente != null)
-        //     {
-        //         cliente.Name = Cliente.Name;
-        //         cliente.Age = Cliente.Age;
-        //         cliente.Active = Cliente.Active;
-        //         cliente.Identity = Cliente.Identity;
+            if (customer == null)
+                return NotFound("Customer doesn't exist");
 
-        //         _context.Customers.Update(cliente);
-        //         await _context.SaveChangesAsync();
-                
-        //         return Ok(Cliente);
-        //     }
+            customer.Name = CustomerModel.Name;
+            customer.Email = CustomerModel.Email;
+            customer.Phone = CustomerModel.Phone;
+            customer.Age = CustomerModel.Age;
+            customer.Identity = CustomerModel.Identity;
 
-        //     return NotFound();
-        // }
+            await _context.UpdateCustomerAsync(id, customer);
 
-        // [HttpDelete]
-        // [Route("{id}")]
-        // public async Task<IActionResult> Delete(int id)
-        // {
-        //     var cliente = await _context.Customers.Where(x => x.Id == id && x.Active)
-        //         .FirstOrDefaultAsync();
+            return Ok(customer);
 
-        //     if (cliente != null)
-        //     {
-        //         cliente.Active = false;
+        }
 
-        //         _context.Customers.Update(cliente);
-        //         await _context.SaveChangesAsync();
-                
-        //         return NoContent();
-        //     }
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var client = await _context.GetCustomerAsync(id);
+            if (client == null)
+                return NotFound("Id doesn't exist");
 
-        //     return NotFound();
-        // }
+            await _context.DeleteCustomerAsync(id);
+
+            return NoContent();
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,32 +55,39 @@ namespace Sales.API.Controllers
         public async Task<IActionResult> Post([FromBody] ItemInputModel itemInputModel)
         {
             var model = new Item(itemInputModel.Name, itemInputModel.Price);
-            
+
             await itemDataAccess.CreateItemAsync(model);
 
             return Ok(itemInputModel);
         }
 
-        // [HttpPut]
-        // [Route("{id}")]
-        // public async Task<IActionResult> Put(int id, [FromBody] Item itemModel)
-        // {
-        //     var model = await itemDataAccess.UpdateOne(id, itemModel);
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> Put(string id, [FromBody] ItemInputModel itemModel)
+        {
+            var item = await itemDataAccess.GetItemAsync(id);
+            if (item == null)
+                return NotFound("Item doesn't exist");
 
-        //     if (model != null)
-        //     {
-        //         return Ok(model);
-        //     }
+            item.Price = itemModel.Price;
+            item.Name = itemModel.Name;
 
-        //     return NotFound();
-        // }
+            await itemDataAccess.UpdateItemAsync(id, item);
 
-        // [HttpDelete]
-        // [Route("{id}")]
-        // public async Task<IActionResult> Delete(int id)
-        // {
-        //     await itemDataAccess.DeleteOne(id);
-        //     return NoContent();
-        // }
+            return Ok(item);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var item = await itemDataAccess.GetItemAsync(id);
+            if (item == null)
+                return NotFound("Item doesn't exist");
+
+            await itemDataAccess.DeleteItemAsync(id);
+
+            return NoContent();
+        }
     }
 }

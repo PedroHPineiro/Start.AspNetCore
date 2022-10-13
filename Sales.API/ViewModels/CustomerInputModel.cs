@@ -10,13 +10,15 @@ namespace Sales.API.ViewModels
     {
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
-
+        
         public string Phone { get; set; }
-
+        
         public string Email { get; set; }
 
         public int Age { get; set; }
-        
+
+        [Required(ErrorMessage = "Identity is required")]
+        [StringLength(14,MinimumLength =14, ErrorMessage = "Identity must have 14 digits")]
         public string Identity { get; set; }
     }
 }

@@ -15,7 +15,6 @@ namespace Sales.API.ViewModels
         public string CustomerId { get; set; }
 
         [Required(ErrorMessage = "Items is required")]
-        
         public Dictionary<string, int> Items { get; set; }
     }
 }
