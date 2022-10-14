@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Sales.API.DataAccess;
 using Sales.API.DataAccessNoSql;
 using Sales.API.Models;
 using Sales.API.ViewModels;
@@ -76,20 +77,21 @@ namespace Sales.API.Controllers
         //ATUALIZAR PEDIDO
        [HttpPut]
        [Route("{id}")]
-       public async Task<IActionResult> Update(string id, OrderInputModel orderModel)
+       public async Task<IActionResult> Update(string id,[FromBody] OrderInputModel updateModel)
        {
-            var order = await orderDataAccess.GetOrderAsync(id);
-           if (order == null)
-               return NotFound("Order doesn't exist");
+            var order = await customerDataAccess.GetCustomerAsync(updateModel.CustomerId);
+            var model = new Order(updateModel.Vendor, order);
 
-            order.Vendor = orderModel.Vendor;
-            order.Customer.Id = orderModel.CustomerId;
-            order.Items = order.Items;
+            foreach (var itemDic in updateModel.Items)
+            {
+                var item = await itemDataAccess.GetItemAsync(itemDic.Key);
+                model.AddOrderItem(new OrderItem(item, itemDic.Value));
+            }
+            model.Id = id;
+            await orderDataAccess.UpdateOrderAsync(id, model);
 
-           await orderDataAccess.UpdateOrderAsync(id, order);
-       
-           return Ok(order);
-       }
+            return Ok(model);
+        }
         //DELETAR UM PEDIDO
         [HttpDelete]
         [Route("{id}")]

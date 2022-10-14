@@ -29,6 +29,6 @@ namespace Sales.API.DataAccessNoSql
         
         public async Task CreateItemAsync(Item item) => await collection.InsertOneAsync(item);
         public async Task UpdateItemAsync(string id, Item item) => await collection.ReplaceOneAsync(x => x.Id == id, item);
-        public async Task DeleteItemAsync(string id) => await collection.DeleteOneAsync(id);
+        public async Task DeleteItemAsync(string id) => await collection.DeleteOneAsync(x => x.Id == id);
     }
 }
